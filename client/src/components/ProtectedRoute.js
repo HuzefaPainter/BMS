@@ -52,16 +52,17 @@ const { Header, Footer} = Layout;
         label: `${response.data.name}`,
         icon: <UserOutlined />,
         onClick: () => {
-          if (response.data.isAdmin) {
+          if (response.data.role === "admin") {
             navigate("/admin");
+          } else if (response.data.role === "partner") {
+            navigate("/partner");
           } else {
-            navigate("/profile");
+            navigate("/user")
           }
         },
       };
       let updatedNavItems = [...navItems];
       updatedNavItems.splice(1, 0, profileItem);
-      console.log(updatedNavItems);
       setNavItems(updatedNavItems);
     } 
     else{

@@ -1,17 +1,14 @@
-const router= require('express').Router();
-const User = require('../models/userModel.js');
-const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken');
+const userRouter= require('express').Router();
 const authMiddleware = require("../middlewares/authMiddleware.js");
 const loginUser = require('../controllers/loginController.jsx');
 const registerUser = require('../controllers/registerController.jsx');
 const getUser = require('../controllers/getUserController.jsx');
 
-router.post("/register", registerUser)
+userRouter.post("/register", registerUser)
     
-router.post("/login", loginUser)
+userRouter.post("/login", loginUser)
    
-router.get("/get-current-user", authMiddleware, getUser)
+userRouter.get("/get-current-user", authMiddleware, getUser)
     
 
-module.exports = router;
+module.exports = userRouter;

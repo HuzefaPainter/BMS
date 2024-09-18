@@ -18,7 +18,17 @@ import { axiosInstance } from ".";
         return response.data;
         
     } catch (err) {
-        return err;
+        if (err.response) {
+            // Server responded with a status other than 2xx
+            return err.response.data;
+        } else if (err.request) {
+            // Request was made but no response received
+            console.log("ERROR REQUEST: ", err.request);
+        } else {
+            // Something else happened in setting up the request
+            console.log("ERROR: ", err.message);
+        }
+        return { success: false, message: "An error occurred." };
     }
  }
 
