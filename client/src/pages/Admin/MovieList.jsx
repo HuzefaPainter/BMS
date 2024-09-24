@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, message } from "antd";
-import MovieForm from "./MovieForm";
-import { HideLoading, ShowLoading } from "../../redux/loaderSlice.js";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import { Table, Button, message } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import DeleteMovie from "./DeleteMovie";
-import { getAllMovie } from "../../apicalls/movie";
+import { HideLoading, ShowLoading } from "../../redux/loaderSlice.js";
+import MovieForm from "./MovieForm.jsx";
+import DeleteMovie from "./DeleteMovie.jsx";
+import { getAllMovie } from "../../apicalls/movie.js";
 
 function MovieList() {
   const [isModalOpen, setIsModalOpen] = useState(false);

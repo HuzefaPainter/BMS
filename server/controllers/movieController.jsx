@@ -11,9 +11,7 @@ async function addMovie(request,response) {
         const newMovieData = { ...request.body, releaseDate };
 
         const newMovie = new Movie(newMovieData);
-        const movieResponse = await newMovie.save();
-        console.log(movieResponse)
-        
+        const movieResponse = await newMovie.save();        
         response.send({
             success: true,
             message: "Movie added successfully",

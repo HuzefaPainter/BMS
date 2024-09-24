@@ -41,3 +41,23 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.login-container .register-link-container {
+    text-align: center;  /* Center the text */
+    margin-top: 20px;    /* Add some margin to the top for spacing */
+  }
+  
+  .login-container .register-link-container p {
+    font-size: 14px;     /* Adjust the text size */
+    color: #555;         /* Change the text color */
+  }
+  
+  .login-container .register-link-container a {
+    color: #1890ff;      /* Customize the link color */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold;   /* Make the link bold */
+  }
+  
+  .login-container .register-link-container a:hover {
+    text-decoration: underline;  /* Underline on hover */
+  }

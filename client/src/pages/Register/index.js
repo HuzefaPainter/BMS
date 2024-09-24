@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, Button, message, Radio } from "antd";
 import { UserOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
 import { RegisterUser } from "../../apicalls/user";
 import { Link, useNavigate } from "react-router-dom";
@@ -74,7 +74,26 @@ const Registration = () => {
             Register
           </Button>
         </Form.Item>
+        <Form.Item
+        label="Register as Partner"
+        htmlFor="role"
+          name="role"
+          initialValue={false}
+          rules={[{ required: true, message: "Please select the Role!" }]}
+        >
+          <div>
+            <Radio.Group name="radiogroup">
+            <Radio value={"partner"}>Yes</Radio>
+            <Radio value={"user"}>No</Radio>
+            </Radio.Group>
+          </div>
+        </Form.Item>
       </Form>
+      <div className="register-link-container">
+            <p>
+              Already a User? <Link to="/login">Login</Link>
+            </p>
+          </div>
     </div>
   );
 };

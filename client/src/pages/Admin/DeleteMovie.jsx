@@ -17,7 +17,6 @@ function DeleteMovie({
     try {
       dispatch(ShowLoading());
       const response = await deleteMovie(selectedMovie._id);
-      console.log(response);
       if (response.success) {
         message.success(response.message);
         getData();

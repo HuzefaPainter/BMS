@@ -1,8 +1,10 @@
 const userRouter= require('express').Router();
 const authMiddleware = require("../middlewares/authMiddleware.js");
-const loginUser = require('../controllers/loginController.jsx');
-const registerUser = require('../controllers/registerController.jsx');
-const getUser = require('../controllers/getUserController.jsx');
+const {
+    getUser,
+    loginUser,
+    registerUser,
+  } = require("../controllers/userController.jsx");
 
 userRouter.post("/register", registerUser)
     

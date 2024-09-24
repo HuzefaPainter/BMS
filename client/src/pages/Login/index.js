@@ -70,6 +70,11 @@ const Login = () => {
           </Button>
         </Form.Item>
       </Form>
+      <div className="register-link-container">
+        <p>
+          New User?<Link to="/register">Register here</Link>
+        </p>
+      </div>
     </div>
   );
 };
