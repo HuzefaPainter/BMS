@@ -1,7 +1,7 @@
-import React, { Children } from 'react'
+import React from 'react'
 
 import {Tabs} from "antd";
-import TheatreTable from './TheatreTable';
+import TheatreList from '../Partner/TheatreList';
 import MovieList from './MovieList';
 
 function Admin() {
@@ -15,7 +15,7 @@ function Admin() {
     {
         key: "2",
         label: "Theaters",
-        children : <TheatreTable />
+        children : <TheatreList isAdmin = {true} />
 
     }
 ]

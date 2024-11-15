@@ -5,6 +5,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice.js";
 import TheatreForm from "./TheatreForm.jsx";
 import DeleteTheatre from "./DeleteTheatre.jsx";
+import ShowModal from "./ShowModal.jsx";
 import {getAllTheatres, getAllTheatresByOwner, updateTheatre} from "../../apicalls/theatre.js"
 
 function TheatreList() {
@@ -14,6 +15,7 @@ function TheatreList() {
     const [selectedTheatre, setSelectedTheatre] = useState(null);
     const [formType, setFormType] = useState("add");
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [isShowModalOpen, setShowModalOpen] = useState(false);
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
@@ -84,14 +86,17 @@ function TheatreList() {
             return adminActions(data);
           }
           return(
-            <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px', alignItems: 'center' }}>
               <Button onClick={() => {setIsModalOpen(true); setSelectedTheatre(data); setFormType("edit");}}>
                 <EditOutlined/>
               </Button>
               <Button onClick={() => {setDeleteModalOpen(true); setSelectedTheatre(data);}}>
                 <DeleteOutlined/>
               </Button>
-            </div>
+              {data.isActive === true?
+              <Button onClick={() => {setShowModalOpen(true); setSelectedTheatre(data);}}> + Show
+              </Button> : <></>}
+            </div>          
           )
         }
       }
@@ -147,6 +152,16 @@ function TheatreList() {
         <DeleteTheatre
           isDeleteModalOpen={isDeleteModalOpen}
           setDeleteModalOpen={setDeleteModalOpen}
+          getData={getData}
+          selectedTheatre={selectedTheatre}
+          setSelectedTheatre={setSelectedTheatre}
+        />
+      )}
+
+     {isShowModalOpen && (
+        <ShowModal
+          isShowModalOpen ={isShowModalOpen}
+          setShowModalOpen={setShowModalOpen}
           getData={getData}
           selectedTheatre={selectedTheatre}
           setSelectedTheatre={setSelectedTheatre}

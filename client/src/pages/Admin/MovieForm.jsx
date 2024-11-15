@@ -28,6 +28,7 @@ function MovieForm({
       let response = null;
       if (formType === "add") {
         console.log(values);
+        console.log("release date value:", values.releaseDate)
         response = await addMovie(values);
       } else {
         const updatedMovie = values;
@@ -113,7 +114,7 @@ function MovieForm({
             <Row gutter={{ xs: 6, sm: 10, md: 12, lg: 16 }} >
               <Col span={8}>
                 <Form.Item label="Select Movie Genre" name="genre" rules={[{ required: true, message: "Movie Genre is required" }]}>
-                  <Select placeholder="Select Genre" options={[{ value: "Action", label: "Action" }, { value: "Sci-Fi", label: "Sci-Fi" }, { value: "Horror", label: "Horror" }, { value: "Comedy", label: "Comedy" }, { value: "Thriller", label: "Thriller" }, { value: "Drama", label: "Drama" },]} />
+                  <Select placeholder="Select Genre" options={[{ value: "Action", label: "Action" }, { value: "Sci-Fi", label: "Sci-Fi" }, { value: "Horror", label: "Horror" }, { value: "Comedy", label: "Comedy" }, { value: "Thriller", label: "Thriller" }, { value: "Drama", label: "Drama" },{value: "Biography", label: "Biography" },]} />
                 </Form.Item>
               </Col>
               <Col span={8}>

@@ -15,7 +15,7 @@ movieRouter.delete("/delete-movie/:id", deleteMovie);
 
 movieRouter.put("/update-movie", updateMovie);
 
-movieRouter.get("/get-movie", getMovie);
+movieRouter.get("/get-movie/:movieId", getMovie);
 
 movieRouter.get("/get-all-movie", getAllMovie);
 

@@ -1,0 +1,18 @@
+/* Center search bar on the page */
+.center-search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px; /* Adjust vertical spacing as needed */
+  }
+  
+  .search-input {
+    width: 80%; /* Adjust width as per your design */
+    max-width: 600px; /* Optionally limit max-width for better responsiveness */
+  }
+  
+  @media (max-width: 768px) {
+    .search-input {
+      width: 80%; /* Increase width on smaller screens for better usability */
+    }
+  }

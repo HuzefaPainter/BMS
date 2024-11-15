@@ -6,9 +6,11 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
 import Partner from './pages/Partner'
+import SingleMovie from './pages/Home/SingleMovie.jsx';
 //import Profile from "./pages/Profile";
 
 import "./index.css";
+import "./App.css";
 
 import ProtectedRoute from "./components/ProtectedRoute.js";
 
@@ -27,16 +29,7 @@ function App() {
           <Route path='/register' element={<Register />} />
           <Route path="/admin" element={<ProtectedRoute> <Admin /></ProtectedRoute>}/>
           <Route path="/partner" element={<ProtectedRoute> <Partner/> </ProtectedRoute>}/>
-
-            {/* <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
- */}
+          <Route path="/movie/:id" element={ <ProtectedRoute> <SingleMovie /> </ProtectedRoute> }/>
         </Routes>
       </Router>
     </div>

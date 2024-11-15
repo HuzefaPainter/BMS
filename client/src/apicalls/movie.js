@@ -10,6 +10,16 @@ export const getAllMovie = async () => {
     }
  };
 
+ export const getMovie = async (movieId) => {
+    try{
+        const response = await axiosInstance.get(`/get-movie/${movieId}`);
+        return response.data;
+    }
+    catch(err) {
+        console.log("Error while calling getMovie API", err);
+    }
+ };
+
  export const addMovie = async (payload) => {
     try{
         const response = await axiosInstance.post("/add-movie", payload);

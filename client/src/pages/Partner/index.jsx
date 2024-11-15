@@ -8,7 +8,7 @@ function Partner() {
     {
       key: "1",
       label: "Theatres",
-      children: <TheatreList/>
+      children: <TheatreList isAdmin={false}/>
     }
   ];
 

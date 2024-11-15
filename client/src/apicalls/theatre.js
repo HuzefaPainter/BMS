@@ -30,6 +30,16 @@ export const addTheatre = async (payload) => {
     }
  };
 
+ export const getAllTheatresByMovie = async (movieId) => {
+    try{
+        const response = await axiosInstance.get(`/get-all-theatres-by-movie/${movieId}`);
+        return response.data;
+    }
+    catch(err) {
+        console.log("Error while calling getAllTheatresByMovie API", err);
+    }
+ };
+
  export const updateTheatre = async (payload) => {
     try{
         const response = await axiosInstance.put("/update-theatre", payload);

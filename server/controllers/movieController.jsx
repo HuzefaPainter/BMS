@@ -6,16 +6,19 @@ const Movie = require('../models/movieModel.js');
 async function addMovie(request,response) {
     try {
 
-        const [day, month, year] = request.body.releaseDate.split("-");
+        const [year, month, day] = request.body.releaseDate.split("-");
         const releaseDate = new Date(`${year}-${month}-${day}`);
         const newMovieData = { ...request.body, releaseDate };
-
         const newMovie = new Movie(newMovieData);
-        const movieResponse = await newMovie.save();        
-        response.send({
-            success: true,
-            message: "Movie added successfully",
-        });
+        const movieResponse = await newMovie.save();   
+        if (movieResponse) {
+            return response.send({
+                success: true,
+                message: "Movie added successfully",
+            });
+        }
+        throw new Error("Failed to add movie.");        
+        
     } catch (error) {
         console.log(error.message);
         response.status(500).send({
@@ -82,11 +85,16 @@ async function getMovie(request,response) {
 async function getAllMovie(request,response) {
     try {
         const allMovies = await Movie.find();
-        response.send({
-            success: true,
-            message: "Movies fetched successfully",
-            data: allMovies
-        });
+        if (allMovies){
+            response.send({
+                success: true,
+                message: "Movies fetched successfully",
+                data: allMovies
+            });
+        }else{
+            throw(somethingWentWrong);
+        }
+        
     } catch (error) {
         response.status(500).send({
             success:false,

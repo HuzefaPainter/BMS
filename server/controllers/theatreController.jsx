@@ -1,5 +1,6 @@
 const router= require('express').Router();
 const Theatre = require('../models/theatreModel');
+const Show = require('../models/showModel');
 
 async function addTheatre(request,response) {
     try {
@@ -66,6 +67,40 @@ try {
 }
 }
 
+async function getAllTheatresByMovie(request,response) {    
+  try {
+      const movie = request.params.movieId;
+      const allShowsByMovie = await Show.find({movie}).populate('theatre');
+
+      const theatreSet = new Set();
+      let allTheatres = [];
+
+      for (const show of allShowsByMovie){
+        if (!theatreSet.has(show.theatre._id)){
+          const showsInThisTheatre = allShowsByMovie.filter((showToFilter) => showToFilter.theatre._id === show.theatre._id);
+          theatreSet.add(show.theatre._id);
+          allTheatres.push({theatre: show.theatre, shows: showsInThisTheatre})
+        }
+      }
+
+      if(allTheatres){
+          response.send({
+              success: true,
+              message: "All Theatres according to movies fetched successfully",
+              data: allTheatres,
+          });
+      }
+      else{
+          throw(somethingWentWrong);
+      }    
+  } catch (error) {
+      response.status(500).send({
+          success:false,
+          message: "Something went wrong"
+      });
+  }
+  }
+
 const updateTheatre = async (req, res) => {
     try {
       const updatedTheatre = await Theatre.findByIdAndUpdate(req.body._id, req.body);
@@ -99,4 +134,4 @@ const updateTheatre = async (req, res) => {
     }
   };
 
-module.exports = {addTheatre, getAllTheatres, getAllTheatresByOwner, updateTheatre, deleteTheatre};
+module.exports = {addTheatre, getAllTheatres, getAllTheatresByOwner,getAllTheatresByMovie, updateTheatre, deleteTheatre};
