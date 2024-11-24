@@ -5,8 +5,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
-import Partner from './pages/Partner'
+import Partner from './pages/Partner';
 import SingleMovie from './pages/Home/SingleMovie.jsx';
+import BookShow from './pages/Home/BookShow.js';
 //import Profile from "./pages/Profile";
 
 import "./index.css";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute> <Admin /></ProtectedRoute>}/>
           <Route path="/partner" element={<ProtectedRoute> <Partner/> </ProtectedRoute>}/>
           <Route path="/movie/:id" element={ <ProtectedRoute> <SingleMovie /> </ProtectedRoute> }/>
+          <Route path="/book-show/:id" element={<ProtectedRoute> <BookShow/> </ProtectedRoute>}/>
         </Routes>
       </Router>
     </div>

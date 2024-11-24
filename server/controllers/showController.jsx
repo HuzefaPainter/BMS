@@ -26,7 +26,7 @@ async function addShow(request, response) {
 }
 async function getShow(request, response) {
     try {
-        const show = await Show.findById(request.params.id).populate('movie').populate('theatre');
+        const show = await Show.findById(request.params.showId).populate('movie').populate('theatre');
         if (show) {
             response.send({
                 success:true,
@@ -156,4 +156,4 @@ async function updateShow(request, response){
     }
 }
 
-module.exports= {addShow, getAllShows, getShowsByTheatre, getShow,getShowsByMovie, deleteShow, updateShow};
+module.exports= {addShow, getAllShows, getShowsByTheatre, getShow, getShowsByMovie, deleteShow, updateShow};
