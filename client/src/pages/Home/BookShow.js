@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
 import { getShow } from "../../apicalls/show";
-import { bookShow, makePayment } from "../../apicalls/booking";
+import { bookShow, generateTransaction, makePayment, paymentSuccess } from "../../apicalls/booking";
 import { Button, message, Card, Row, Col } from "antd";
 import moment from "moment";
+import { useLocation } from "react-router-dom";
 
 function BookShow() {
   const { user } = useSelector((state) => state.user);
@@ -84,10 +85,8 @@ function BookShow() {
               }
             );
             return (
-              <Row>
-                {arrOfSeats.map((ele)=>ele)}
-              </Row>
-            )
+              <Row key={`row-${rowNo}`}>{arrOfSeats.map((ele) => ele)}</Row>
+            );
           })}
         </ul>
         <div
@@ -112,61 +111,75 @@ function BookShow() {
 
   const handlePayU = async () => {
     try {
+
       dispatch(ShowLoading());
-      const response = await makePayment({
+
+      const response = await bookShow({
+        show: show._id,
+        seats: selectedSeats,
+        user: user._id,
         amount: selectedSeats.length * show.ticketPrice,
+        productInfo: show.movie.title + " tickets",
         firstname: user.name,
         email: user.email,
-        bookingInfo: show.movie.title,
-        txnid: `txn_${new Date().getTime()}`,
       });
 
-      if (response.success === true) {
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "https://sandboxsecure.payu.in/_payment";
+      console.log("BookShow.js", response)
 
-        Object.keys(response.data).forEach((key) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = response.data[key];
-          form.appendChild(input);
-        });
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        message.error(response.message);
+      if (response.success != true ) {
+        throw new Error(
+          "Something went wrong processing your payment, please try again"
+        );
       }
-      dispatch(HideLoading());
+      const paymentData = response.data.paymentResponse;
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://test.payu.in/_payment"; // PayU URL for test/prod
+
+       Object.entries(paymentData).forEach(([key, value]) => {
+         const input = document.createElement("input");
+         input.type = "hidden";
+         input.name = key;
+         input.value = value;
+         form.appendChild(input);
+       });
+
+      // Append the form to the document body and submit it
+      document.body.appendChild(form);
+      form.submit();
     } catch (error) {
       message.error(error.message);
       dispatch(HideLoading());
     }
+
   };
 
-  const book = async (transactionId) => {
-    try {
-      dispatch(ShowLoading());
-      const response = await bookShow({
-        show: params.id,
-        transactionId,
-        seats: selectedSeats,
-        user: user._id,
-      });
 
-      if (response.success === true) {
-        message.success(response.message);
-        navigate("/profile");
-      } else {
-        message.error(response.message);
-      }
-      dispatch(HideLoading());
-    } catch (err) {
-      console.log(err);
-      dispatch(HideLoading());
-    }
-  };
+  // const book = async (txnid) => {
+  //   try {
+  //     dispatch(ShowLoading());
+  //     const response = await bookShow({
+  //       show: params.id,
+  //       seats: selectedSeats,
+  //       user: user._id,
+  //       transactionId: txnid,
+  //     });
+  //     if (response.success == true) {
+  //       message.success(response.message);
+  //     } else {
+  //       message.error(response.message);
+  //       dispatch(HideLoading());
+  //       return false;
+  //     }
+  //     dispatch(HideLoading());
+  //     return true;
+  //   } catch (err) {
+  //     console.log(err);
+  //     message.error(err);
+  //     dispatch(HideLoading());
+  //     return false;
+  //   }
+  // };
 
   return (
     <div>
@@ -210,19 +223,9 @@ function BookShow() {
                     shape="round"
                     size="large"
                     block
-                    onClick={async () => {
-                      try {
-                        await handlePayU();
-                        const transactionId = `txn_${new Date().getTime()}`;
-                        await book(transactionId);
-                      } catch (err) {
-                        message.error(
-                          "Payment or booking failed. Please try again."
-                        );
-                      }
-                    }}
+                    onClick={handlePayU}
                   >
-                    Pay Now
+                  Make Payment
                   </Button>
                 </div>
               )}

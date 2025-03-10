@@ -1,11 +1,15 @@
-const bookingRouter = require('express').Router();
-const {
-    makePayment,
-    bookShow,
-  } = require("../controllers/bookingController.jsx");
+  const bookingRouter = require('express').Router();
+  const {
+      bookShow,
+      paymentFailure,
+      paymentSuccess,
+    } = require("../controllers/bookingController.jsx");
 
-bookingRouter.post("/make-payment", makePayment);
+  bookingRouter.post("/book-show", bookShow);
 
-bookingRouter.post("/book-show", bookShow);
+  bookingRouter.post("/payment-success", paymentSuccess);
 
-module.exports = bookingRouter;
+  bookingRouter.post("/payment-failure", paymentFailure);
+
+
+  module.exports = bookingRouter;

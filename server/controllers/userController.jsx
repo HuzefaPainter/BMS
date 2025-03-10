@@ -20,7 +20,21 @@ try {
     });
 }
 }
- 
+
+async function bookingConfirmed(request,response) {
+try {
+    const user = await User.findById(request.body.userId).select("-password");
+    response.send({
+        success: true,
+        message: "User details fetched successfully",
+        data: user
+    });
+} catch (error) {
+    response.status(500).send({
+        success:false,
+        message: "Something went wrong"
+    });
+}}
 
 async function loginUser (request, response) {
  try{
@@ -90,4 +104,4 @@ async function registerUser (request, response) {
         };
     }
     
-module.exports = {getUser, loginUser, registerUser};
+module.exports = {getUser, loginUser, registerUser, bookingConfirmed};

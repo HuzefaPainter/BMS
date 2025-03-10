@@ -1,29 +1,27 @@
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
-{
+{   
     show : {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "shows"
-    }
-},
-{
+    },
     user:{
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "users"
-    }
-},
-{
+    },
     seats:{
         type: Array,
         required: true
-    }
-},
-{
+    },
     transactionId:{
         type: String,
         required: true
-    }
+    },
+    status:{ 
+        type: String, 
+        enum: ["pending", "confirmed", "failed"], default: "pending" 
+    },
 },
 {
     timestamps: true

@@ -4,11 +4,14 @@ const {
     getUser,
     loginUser,
     registerUser,
+    bookingConfirmed  
   } = require("../controllers/userController.jsx");
 
 userRouter.post("/register", registerUser)
     
 userRouter.post("/login", loginUser)
+
+userRouter.post("/booking-confirmed", bookingConfirmed)
    
 userRouter.get("/get-current-user", authMiddleware, getUser)
     

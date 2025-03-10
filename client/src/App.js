@@ -8,13 +8,13 @@ import Admin from './pages/Admin';
 import Partner from './pages/Partner';
 import SingleMovie from './pages/Home/SingleMovie.jsx';
 import BookShow from './pages/Home/BookShow.js';
-//import Profile from "./pages/Profile";
+import PaymentSuccess from './pages/Home/PaymentSuccess.jsx';
+import PaymentFailure from './pages/Home/PaymentFailure.jsx'
 
 import "./index.css";
 import "./App.css";
 
 import ProtectedRoute from "./components/ProtectedRoute.js";
-
 
 function App() {
   const { loading } = useSelector((state) => state.loaders); 
@@ -32,6 +32,9 @@ function App() {
           <Route path="/partner" element={<ProtectedRoute> <Partner/> </ProtectedRoute>}/>
           <Route path="/movie/:id" element={ <ProtectedRoute> <SingleMovie /> </ProtectedRoute> }/>
           <Route path="/book-show/:id" element={<ProtectedRoute> <BookShow/> </ProtectedRoute>}/>
+          <Route path="/payment-success" element={<ProtectedRoute> <PaymentSuccess/> </ProtectedRoute>}/>
+          <Route path="/payment-failure" element={<ProtectedRoute> <PaymentFailure/> </ProtectedRoute>}/>
+
         </Routes>
       </Router>
     </div>
