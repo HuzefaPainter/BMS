@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment";
 import { addMovie, updateMovie } from "../../apicalls/movie";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Form, Input, message, Modal, Row, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
@@ -15,6 +15,7 @@ function MovieForm({
   getData,
 }) {
   const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.loaders);
 
   if (selectedMovie) {
     selectedMovie.releaseDate = moment(selectedMovie.releaseDate).format(
@@ -55,6 +56,22 @@ function MovieForm({
     setIsModalOpen(false);
     setSelectedMovie(null);
   };
+
+  if(loading){
+    return (
+    <Modal
+      centered
+      open={isModalOpen}
+      onCancel={handleCancel}
+      width={800}
+      footer={null}
+    >
+      <div className="spinner-centered">
+        <div className="spinner"/>
+      </div>
+    </Modal >
+    );
+  }
 
   return (
     <Modal

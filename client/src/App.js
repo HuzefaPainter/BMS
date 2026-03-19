@@ -17,7 +17,8 @@ import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute.js";
 
 function App() {
-  const { loading } = useSelector((state) => state.loaders); 
+  const { loading } = useSelector((state) => state.loaders);
+    console.log("Hello world");
   return (
     <div>
       <div>

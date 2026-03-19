@@ -12,11 +12,12 @@ function TheatreForm({
   setSelectedTheatre,
   formType,
   getData,
-}) 
+})
 {
   const dispatch = useDispatch();
   const {user} = useSelector((state) => state.user);
-  
+  const { loading } = useSelector((state) => state.loaders);
+
 
   const onFinish = async(values) => {
     try {
@@ -51,6 +52,22 @@ function TheatreForm({
   const handleCancel = () => {
     setSelectedTheatre(null);
     setIsModalOpen(false);
+  }
+
+  if(loading){
+    return (
+    <Modal
+      centered
+      open={isModalOpen}
+      onCancel={handleCancel}
+      width={800}
+      footer={null}
+    >
+      <div className="spinner-centered">
+        <div className="spinner"/>
+      </div>
+    </Modal >
+    );
   }
 
   return (
@@ -88,7 +105,7 @@ function TheatreForm({
                 <Form.Item
                   label="Phone Number"
                   name="phoneNumber"
-                  rules={[{ required: true, message: "Theatre phone number is required" }, {type: "number", message: "Enter a valid Phone Number"}]}
+                  rules={[{ required: true, message: "Theatre phone number is required" }, { pattern: /^[0-9]{10}$/, message: "Enter a valid Phone Number" }]}
                 >
                   <Input placeholder='Enter the Theatre phone number' />
                 </Form.Item>
