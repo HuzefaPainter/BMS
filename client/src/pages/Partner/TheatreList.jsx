@@ -35,7 +35,7 @@ function TheatreList() {
         dispatch(HideLoading());
       } catch (error) {
         dispatch(HideLoading());
-        console.log("Error while updating status:", error.message);        
+        console.log("Error while updating status:", error.message);
       };
     }
 
@@ -45,7 +45,7 @@ function TheatreList() {
           <div>
             <Button onClick={() => {handleStatusUpdate(data);}}>Block</Button>
           </div>
-        )      
+        )
       }else{
         return(
           <div>
@@ -96,7 +96,7 @@ function TheatreList() {
               {data.isActive === true?
               <Button onClick={() => {setShowModalOpen(true); setSelectedTheatre(data);}}> + Show
               </Button> : <></>}
-            </div>          
+            </div>
           )
         }
       }
@@ -130,15 +130,18 @@ function TheatreList() {
 
   return (
     <div>
-      <Button onClick={() => {
-        setIsModalOpen(true);
-        setFormType("add");}}>
+      {!isAdmin && (
+        <Button onClick={() => {
+          setIsModalOpen(true);
+          setFormType("add");
+        }}>
           Add Theatre
         </Button>
-        <div style={{marginBottom: 10}}/>
-        <Table dataSource={theatres} columns={tableHeadings}/>
+      )}
+      <div style={{marginBottom: 10}}/>
+      <Table dataSource={theatres} columns={tableHeadings}/>
 
-        {isModalOpen && (
+      {isModalOpen && (
         <TheatreForm
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
@@ -158,7 +161,7 @@ function TheatreList() {
         />
       )}
 
-     {isShowModalOpen && (
+      {isShowModalOpen && (
         <ShowModal
           isShowModalOpen ={isShowModalOpen}
           setShowModalOpen={setShowModalOpen}

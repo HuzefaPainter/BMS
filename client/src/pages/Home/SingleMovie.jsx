@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getMovie } from "../../apicalls/movie";
 import { getAllTheatresByMovie } from "../../apicalls/theatre";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
 import { message, Input, Row, Col, Tag } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
@@ -15,6 +15,7 @@ const SingleMovie = () => {
   const [theatres, setTheatres] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
 
   const handleDate = (e) => {
     setDate(moment(e.target.value).format("YYYY-MM-DD"));
@@ -159,9 +160,19 @@ const SingleMovie = () => {
                     {theatre.shows.map((show) => (
                       <Tag
                         key={show._id}
-                        color="blue"
-                        style={{ cursor: "pointer", fontSize: "14px", padding: "6px 12px" }}
-                        onClick={() => navigate(`/book-show/${show._id}`)}
+                        color={user?.role === "user" ? "blue" : "default"}
+                        style={{
+                          cursor: user?.role === "user" ? "pointer" : "not-allowed",
+                          fontSize: "14px",
+                          padding: "6px 12px"
+                        }}
+                        onClick={() => {
+                          if (user?.role !== "user") {
+                            message.warning("Only users can book tickets");
+                            return;
+                          }
+                          navigate(`/book-show/${show._id}`)
+                        }}
                       >
                         {moment(show.time, "HH:mm").format("hh:mm A")}
                       </Tag>
