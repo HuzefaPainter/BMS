@@ -2,7 +2,7 @@ import React from 'react';
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
 import { useEffect, useState } from 'react';
 import {message, Row, Col, Input} from "antd";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SearchOutlined } from "@ant-design/icons";
 import moment from "moment";
@@ -14,6 +14,7 @@ const Home = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.loaders);
 
   const getData = async () => {
     try {
@@ -42,6 +43,14 @@ const Home = () => {
     console.log("searchText", searchText);
   }
 
+  if(loading){
+    return (
+      <div className="spinner-centered">
+        <div className="spinner"/>
+      </div>
+    )
+  }
+
   return (
     <div>
       <Row className="center-search-bar">
@@ -58,12 +67,12 @@ const Home = () => {
         </Col>
       </Row>
       <Row gutter={{xs: 8, sm:16, md: 24, lg: 32}}>
-        {movies && movies.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase())).map((movie) => 
+        {movies && movies.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase())).map((movie) =>
         <Col key={movie._id} span={{xs: 24, sm: 24, md: 12, lg: 10}}>
-          <div> 
+          <div>
             <img onClick={() => { navigate(`/movie/${movie._id}?date=${moment().format("YYYY-MM-DD")}`);}} src={movie.poster} alt="Movie Poster" width={200} height={300} style={{borderRadius: "8px"}}/>
             <h3 onClick={() => { navigate(`/movie/${movie._id}?date=${moment().format("YYYY-MM-DD")}`);}}>{movie.title}</h3>
-          </div>        
+          </div>
         </Col>
         )
         }

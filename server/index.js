@@ -11,6 +11,7 @@ const theatreRoute = require("./routes/theatreRoutes");
 const showRoute = require("./routes/showRoutes");
 const bookingRoute = require("./routes/bookingRoutes");
 const transactionRoute = require("./routes/transactionRoutes");
+const startCleanupJob = require("./jobs/cleanupExpiredBookings");
 
 
 app.use(cors());
@@ -25,4 +26,5 @@ app.use("/", transactionRoute);
 
 app.listen(8081, () => {
     console.log('server running')
+    startCleanupJob();
 });

@@ -9,9 +9,11 @@ import {
   Select,
   Space,
   Table,
+  TimePicker
 } from "antd";
+import dayjs from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector  } from "react-redux";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
 import { getAllMovie } from "../../apicalls/movie.js";
 import {
@@ -36,6 +38,7 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
   const [selectedShow, setSelectedShow] = useState(null);
   const dispatch = useDispatch();
   const [form] = Form.useForm(); // Use form instance
+  const { loading } = useSelector((state) => state.loaders);
 
   const handleCancel = async () => {
     setShowModalOpen(false);
@@ -72,7 +75,7 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
       if (showResponse.success) {
         setShows(showResponse.data);
       } else {
-        message.error(showResponse.error);
+        message.error(showResponse.message);
       }
       dispatch(HideLoading());
     } catch (error) {
@@ -88,12 +91,14 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
   useEffect(() => {
     if (view === "edit" && selectedShow) {
       form.setFieldsValue({
-        movie: selectedMovie.title
+        ...selectedShow,
+        time: dayjs(selectedShow.time, "HH:mm"),
+        movie: selectedShow.movie._id,
       });
     } else if (view === "form") {
       form.resetFields();
     }
-  }, [view, selectedShow, form, selectedMovie]);
+  }, [view, selectedShow, form]);
 
 
   const onFinish = async (values) => {
@@ -101,11 +106,14 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
       dispatch(ShowLoading());
       let response = null;
       if (view === "form") {
-        response = await addShow({ ...values, theatre: selectedTheatre._id });
+        response = await addShow({ ...values,
+          time: values.time.format("HH:mm"),
+          theatre: selectedTheatre._id });
       } else {
         response = await updateShow({
           ...values,
           _id: selectedShow._id,
+          time: values.time.format("HH:mm"),
           theatre: selectedTheatre._id,
         });
       }
@@ -199,8 +207,23 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
     },
   ];
 
-  
-  
+  if(loading){
+    return (
+    <Modal
+      centered
+      open={isShowModalOpen}
+      onCancel={handleCancel}
+      width={800}
+      footer={null}
+    >
+      <div className="spinner-centered">
+        <div className="spinner"/>
+      </div>
+    </Modal >
+    );
+  }
+
+
   return (
     <Modal
       centered
@@ -235,6 +258,7 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
           layout="vertical"
           style={{ width: "100%" }}
           initialValues={view === "edit" ? selectedShow : null}
+          initialValues={null}
           onFinish={onFinish}
         >
           <Row gutter={{ xs: 6, sm: 10, md: 12, lg: 16 }}>
@@ -281,10 +305,11 @@ function ShowModal({ isShowModalOpen, setShowModalOpen, selectedTheatre }) {
                       { required: true, message: "Show time is required" },
                     ]}
                   >
-                    <Input
-                      id="time"
-                      type="text"
-                      placeholder="Enter show time"
+                    <TimePicker
+                      use12Hours
+                      format="h:mm A"
+                      minuteStep={15}
+                      style={{ width: "100%" }}
                     />
                   </FormItem>
                 </Col>

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
-{   
+{
     show : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "shows"
@@ -14,14 +14,14 @@ const bookingSchema = new mongoose.Schema(
         type: Array,
         required: true
     },
-    transactionId:{
+    status:{
         type: String,
-        required: true
+        enum: ["pending", "confirmed", "failed"], default: "pending"
     },
-    status:{ 
-        type: String, 
-        enum: ["pending", "confirmed", "failed"], default: "pending" 
-    },
+    expiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 10 * 60 * 1000)
+    }
 },
 {
     timestamps: true

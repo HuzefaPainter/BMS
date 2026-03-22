@@ -6,90 +6,69 @@ const Show = require('../models/showModel');
 const mongoose = require("mongoose");
 const PAYU_KEY = process.env.payu_key;
 const PAYU_SALT = process.env.payu_salt;
-const ngrock_url = process.env.ngrock_domain;
+const ngrock_url = process.env.ngrok_domain;
 const frontend_url = process.env.frontend_domain;
 const {v4: uuidv4} = require('uuid');
 
 async function bookShow(request, response) {
   const session = await mongoose.startSession();
-  const {seats, user, show} = request.body;
-
   session.startTransaction();
 
   try {
+    const { seats, user, show, amount, productInfo, firstname, email } = request.body;
 
-    // Step 1: Fetch and lock the show for seat validation
-
-    const showData = await Show.findById(request.body.show).populate("movie");
-    if (request.body.seats.some(seat => showData.bookedSeats.includes(seat))) {
+    // Step 1 — validate seats
+    const showData = await Show.findById(show).populate("movie");
+    if (seats.some(seat => showData.bookedSeats.includes(seat))) {
       throw new Error("One or more selected seats are already booked. Please try again.");
     }
-    const show = request.body.show
-    // Step 2: Reserve seats and create a pending booking
-    const newBookingData = {user, show, seats, transactionId: generateTransactionId(), status: "pending"}
-    console.log("newBookingData", newBookingData)
-    const newBooking = new Booking(newBookingData);
-    console.log("newBooking", newBooking);
-    if (!newBooking){
-      throw (new Error("Something went wrong while new booking, please try again"));
-    }
 
-    const savedBooking = await newBooking.save();
-    console.log("Booking saved successfully:", savedBooking);
-    if(!savedBooking){
-      throw(new Error("Error saving booking"))
-    }
+    // Step 2 — reserve seats
+    const updatedBookedSeats = [...showData.bookedSeats, ...seats];
+    await Show.findByIdAndUpdate(show, { bookedSeats: updatedBookedSeats });
 
-    const updatedBookedSeats = [...showData.bookedSeats, ...request.body.seats];
-    if(!updatedBookedSeats){
-      throw (new Error("Something went wrong while updating seats, please try again"));
-    }
-    const showUpdateStatus = await Show.findByIdAndUpdate(request.body.show, {bookedSeats: updatedBookedSeats})
+    // Step 3 — create pending booking
+    const newBooking = new Booking({
+      user, show, seats,
+      status: "pending"
+    });
+    const savedBooking = await newBooking.save({ session });
 
-    if(!showUpdateStatus)
-  {
-      throw (new Error("Something went wrong while updating show, please try again"));
-    }
+    // Step 4 — create pending transaction
+    const txnid = uuidv4();
+    const newTransaction = new Transaction({
+      booking: savedBooking._id,
+      user,
+      amount,
+      txnid,
+      productInfo,
+      status: "pending"
+    });
+    const savedTransaction = await newTransaction.save({ session });
+    console.log("SAVED TRANSACTION:", savedTransaction);
 
-    const populateBooking = await Booking.findById(savedBooking._id)
-      .populate("user")
-      .populate("show")
-      .populate({ path: "show", populate: { path: "movie", model: "movies" } })
-      .populate({ path: "show", populate: { path: "theatre", model: "theatres" } })
+    // Step 5 — generate PayU hash
+    const paymentResponse = generatePaymentData({ txnid, amount, productInfo, firstname, email });
 
-
-    if (!populateBooking) {
-      throw (new Error("Something went wrong while booking show, please try again"));
-    }
-
-    const paymentResponse = generatePaymentData(request.body);
-
-    await session.commitTransaction(); // Commit partial success
+    await session.commitTransaction();
     session.endSession();
 
     response.send({
       success: true,
       message: "Booking initiated. Proceed to payment.",
-      data: {
-        booking: populateBooking,
-        paymentResponse: paymentResponse
-      },
+      data: { paymentResponse }
     });
 
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    response.status(500).send({
-      success: false,
-      message: error.message,
-    });
+    response.status(500).send({ success: false, message: error.message });
   }
 }
 
 function generatePaymentData(payload){
   try {
-    const txnid = generateTransactionId() ; // Use booking ID as transaction ID
-    const {amount, productInfo, email, firstname} = payload;
+    const {txnid, amount, productInfo, email, firstname} = payload;
     const hashString = `${PAYU_KEY}|${txnid}|${amount}|${productInfo}|${firstname}|${email}|||||||||||${PAYU_SALT}`;
     const hash = crypto.createHash("sha512").update(hashString).digest("hex");
 
@@ -111,60 +90,79 @@ function generatePaymentData(payload){
   }
 }
 
-function generateTransactionId(){
-  try {
-    return uuidv4();
-  } catch (error) {
-    console.log("Error in generating transaction id", error.message)
-  }
-}
-
 async function paymentSuccess(req, res) {
+  console.log("PAYMENT SUCCESS: ", req.body);
   try {
-    const {txnid, status, amount } = req.body;
+    const { txnid, status, amount } = req.body;
 
-    const updateBookingStatus = await Booking.findByIdAndUpdate(req.body._id,{status : "confirmed"} );
-    console.log(`Booking ${req.body._id} updated`);
+    const transaction = await Transaction.findOneAndUpdate(
+      { txnid },
+      { status: "success" },
+      { new: true }
+    );
 
-    if (!updateBookingStatus) {
-      return res.status(404).json({ success: false, message: "Booking not found" });
+    if (!transaction) {
+      return res.redirect(`${frontend_url}/payment-failure`);
     }
 
-    res.status(200).json({
-      success: true,
-      message: "Payment successful. Booking confirmed!",
-      booking: updateBookingStatus,
-    });
+    await Booking.findByIdAndUpdate(transaction.booking, { status: "confirmed" });
 
-    // Redirect user to frontend with transaction details
     res.redirect(`${frontend_url}/payment-success?txnid=${txnid}&status=${status}&amount=${amount}`);
   } catch (error) {
-    console.error("Error handling payment success:", error.message);
+  console.log("PAYMENT SUCCESS ERROR: ", error);
     res.redirect(`${frontend_url}/payment-failure`);
   }
 }
 
 async function paymentFailure(req, res) {
+  console.log("PAYMENT FAILURE: ", req.body);
   try {
-    const { txnid } = req.body;
+    const { txnid, status } = req.body;
 
-    // Delete the failed booking
-    await Booking.findByIdAndDelete(txnid);
-    console.log(`Booking ${txnid} deleted due to payment failure`);
+    const transaction = await Transaction.findOneAndUpdate(
+      { txnid },
+      { status: "failed" },
+      { new: true }
+    );
 
-    const updateBookingStatus = await Booking.findByIdAndUpdate(req.body._id,{status : "failed"} );
-    if (!updateBookingStatus) {
-      return res.status(404).json({ success: false, message: "Booking not found" });
+    if (transaction) {
+      const booking = await Booking.findByIdAndUpdate(
+        transaction.booking,
+        { status: "failed" },
+        { new: true }
+      );
+
+      // release seats
+      if (booking) {
+        const show = await Show.findById(booking.show);
+        const releasedSeats = show.bookedSeats.filter(
+          seat => !booking.seats.includes(seat)
+        );
+        await Show.findByIdAndUpdate(booking.show, { bookedSeats: releasedSeats });
+      }
     }
 
-    res.status(200).json({
-      success: false,
-      message: "Payment failed. Booking has been removed.",
-      booking: updateBookingStatus
-    });
+    res.redirect(`${frontend_url}/payment-failure?txnid=${txnid}&status=${status}`);
   } catch (error) {
-    res.status(500).json({ success: false, message: "Something went wrong while processing payment failure." });
+    console.log("PAYMENT FAILURE ERROR: ", error);
+    res.redirect(`${frontend_url}/payment-failure`);
   }
 }
 
-module.exports = { bookShow, paymentSuccess, paymentFailure };
+async function getBookingsByUser(req, res) {
+  try {
+    const bookings = await Booking.find({
+      user: req.params.userId,
+      status: "confirmed"
+    })
+      .populate({ path: "show", populate: { path: "movie", model: "movies" } })
+      .populate({ path: "show", populate: { path: "theatre", model: "theatres" } })
+      .sort({ createdAt: -1 });
+
+    res.send({ success: true, data: bookings });
+  } catch (error) {
+    res.status(500).send({ success: false, message: error.message });
+  }
+}
+
+module.exports = { bookShow, paymentSuccess, paymentFailure, getBookingsByUser };

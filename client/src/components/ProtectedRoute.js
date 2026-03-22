@@ -57,14 +57,14 @@ const { Header, Footer} = Layout;
           } else if (response.data.role === "partner") {
             navigate("/partner");
           } else {
-            navigate("/user")
+            navigate("/profile")
           }
         },
       };
       let updatedNavItems = [...navItems];
       updatedNavItems.splice(1, 0, profileItem);
       setNavItems(updatedNavItems);
-    } 
+    }
     else{
       handleUserFetchError(response.message);
     }
@@ -97,7 +97,7 @@ const { Header, Footer} = Layout;
           <Header
             className="d-flex justify-content-between"
             style={{
-              background: '#001529', 
+              background: '#001529',
               position: "sticky",
               top: 0,
               zIndex: 1,
@@ -114,12 +114,12 @@ const { Header, Footer} = Layout;
 
           <div style={{ flex: 1, padding: '24px', background: "#fff" }}>
             {children}
-          </div>   
+          </div>
 
           <Footer
           style={{
             textAlign: 'center',
-            background: '#001529', 
+            background: '#001529',
             color: 'white',
             position: 'sticky',
             bottom: 0,
@@ -127,10 +127,10 @@ const { Header, Footer} = Layout;
           }}
         >
           ©2024 Book My Show. All Rights Reserved.
-        </Footer>      
+        </Footer>
         </Layout>
       </>
-    )   
+    )
   )
 }
 

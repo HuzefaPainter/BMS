@@ -1,27 +1,32 @@
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Button, Result } from "antd";
 
 function PaymentSuccess() {
-    const [searchParams] = useSearchParams();
-    
-    const txnid = searchParams.get("txnid");
-    const status = searchParams.get("status");
-    const amount = searchParams.get("amount");
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const txnid = searchParams.get("txnid");
+  const amount = searchParams.get("amount");
 
-    useEffect(() => {
-        console.log("Transaction ID:", txnid);
-        console.log("Status:", status);
-        console.log("Amount:", amount);
-    }, [txnid, status, amount]);
-
-    return (
+  return (
+    <Result
+      status="success"
+      title="Payment Successful!"
+      subTitle={
         <div>
-            <h2>Payment Successful 🎉</h2>
-            <p>Transaction ID: {txnid}</p>
-            <p>Status: {status}</p>
-            <p>Amount: ₹{amount}</p>
+          <p>Transaction ID: {txnid}</p>
+          <p>Amount Paid: ₹{amount}</p>
         </div>
-    );
+      }
+      extra={[
+        <Button type="primary" onClick={() => navigate("/")}>
+          Back to Home
+        </Button>,
+        <Button onClick={() => navigate("/profile")}>
+          View My Bookings
+        </Button>
+      ]}
+    />
+  );
 }
 
 export default PaymentSuccess;

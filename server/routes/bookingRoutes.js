@@ -1,9 +1,7 @@
   const bookingRouter = require('express').Router();
-  const {
-      bookShow,
-      paymentFailure,
-      paymentSuccess,
-    } = require("../controllers/bookingController.jsx");
+  const { bookShow, paymentFailure, paymentSuccess, getBookingsByUser } = require("../controllers/bookingController.jsx");
+
+  bookingRouter.get("/get-bookings-by-user/:userId", getBookingsByUser);
 
   bookingRouter.post("/book-show", bookShow);
 

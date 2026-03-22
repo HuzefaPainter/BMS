@@ -33,7 +33,7 @@ const Registration = () => {
   return (
     <div className="registration-container">
       <h2>Register</h2>
-      <Form name="register" onFinish={onFinish} scrollToFirstError>
+      <Form name="register" initialValues={{ role: "user" }} onFinish={onFinish} scrollToFirstError>
         {/* Name Field */}
         <Form.Item
           name="name"
@@ -78,15 +78,12 @@ const Registration = () => {
         label="Register as Partner"
         htmlFor="role"
           name="role"
-          initialValue={false}
           rules={[{ required: true, message: "Please select the Role!" }]}
         >
-          <div>
-            <Radio.Group name="radiogroup">
+          <Radio.Group>
             <Radio value={"partner"}>Yes</Radio>
             <Radio value={"user"}>No</Radio>
-            </Radio.Group>
-          </div>
+          </Radio.Group>
         </Form.Item>
       </Form>
       <div className="register-link-container">

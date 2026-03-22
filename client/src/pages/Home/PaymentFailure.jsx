@@ -1,19 +1,23 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Button, Result } from "antd";
 
 function PaymentFailure() {
-    const [searchParams] = useSearchParams();
-    
-    const txnid = searchParams.get("txnid");
-    const status = searchParams.get("status");
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const txnid = searchParams.get("txnid");
 
-    return (
-        <div>
-            <h2>Payment Failed ❌</h2>
-            <p>Transaction ID: {txnid}</p>
-            <p>Status: {status}</p>
-            <p>Please try again.</p>
-        </div>
-    );
+  return (
+    <Result
+      status="error"
+      title="Payment Failed"
+      subTitle={txnid ? `Transaction ID: ${txnid}` : "Something went wrong with your payment."}
+      extra={[
+        <Button type="primary" onClick={() => navigate("/")}>
+          Back to Home
+        </Button>
+      ]}
+    />
+  );
 }
 
 export default PaymentFailure;

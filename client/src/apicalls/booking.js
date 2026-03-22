@@ -26,3 +26,12 @@ export const bookShow = async (payload) => {
         return {success: false, message: "Something went wrong booking the show, please try again."};
     }
 }
+
+export const getBookingsByUser = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`/get-bookings-by-user/${userId}`);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something went wrong fetching bookings" };
+  }
+};

@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { HideLoading, ShowLoading } from "../../redux/loaderSlice";
 import { getShow } from "../../apicalls/show";
-import { bookShow, generateTransaction, makePayment, paymentSuccess } from "../../apicalls/booking";
+import { bookShow } from "../../apicalls/booking";
 import { Button, message, Card, Row, Col } from "antd";
 import moment from "moment";
-import { useLocation } from "react-router-dom";
 
 function BookShow() {
   const { user } = useSelector((state) => state.user);
@@ -55,10 +54,10 @@ function BookShow() {
                 let seatNumber = rowNo * columns + columnNo + 1;
                 let seatClass = "seat-btn";
                 if (selectedSeats.includes(seatNumber)) {
-                  seatClass += "selected";
+                  seatClass += " selected";
                 }
                 if (show.bookedSeats.includes(seatNumber)) {
-                  seatClass += "booked";
+                  seatClass += " booked";
                 }
                 if (seatNumber <= totalSeats) {
                   return (
@@ -89,6 +88,20 @@ function BookShow() {
             );
           })}
         </ul>
+        <div style={{ display: "flex", gap: "16px", marginTop: "16px", justifyContent: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div style={{ width: 20, height: 20, border: "1px solid #555", borderRadius: 3, backgroundColor: "#fff" }} />
+            <span style={{ fontSize: 13 }}>Available</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div style={{ width: 20, height: 20, backgroundColor: "#02a802", borderRadius: 3 }} />
+            <span style={{ fontSize: 13 }}>Selected</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div style={{ width: 20, height: 20, backgroundColor: "#ddd", borderRadius: 3 }} />
+            <span style={{ fontSize: 13 }}>Booked</span>
+          </div>
+        </div>
         <div
           className="d-flex bottom-card justify-content-between w-100 max-width-600
   mx-auto mb-25px mt-3"
@@ -146,6 +159,7 @@ function BookShow() {
 
       // Append the form to the document body and submit it
       document.body.appendChild(form);
+      dispatch(HideLoading());
       form.submit();
     } catch (error) {
       message.error(error.message);
@@ -153,33 +167,6 @@ function BookShow() {
     }
 
   };
-
-
-  // const book = async (txnid) => {
-  //   try {
-  //     dispatch(ShowLoading());
-  //     const response = await bookShow({
-  //       show: params.id,
-  //       seats: selectedSeats,
-  //       user: user._id,
-  //       transactionId: txnid,
-  //     });
-  //     if (response.success == true) {
-  //       message.success(response.message);
-  //     } else {
-  //       message.error(response.message);
-  //       dispatch(HideLoading());
-  //       return false;
-  //     }
-  //     dispatch(HideLoading());
-  //     return true;
-  //   } catch (err) {
-  //     console.log(err);
-  //     message.error(err);
-  //     dispatch(HideLoading());
-  //     return false;
-  //   }
-  // };
 
   return (
     <div>
@@ -202,14 +189,14 @@ function BookShow() {
                   </h3>
                   <h3>
                     <span>
-                      Date & Time: {moment(show.date).format("MM Do YYYY")} at{" "}
+                      Date & Time: {moment(show.date).format("Do MMM YYYY")} at{" "}
                       {moment(show.time, "HH:mm").format("hh:mm A")}
                     </span>
                   </h3>
                   <h3>
                     <span>Total Seats: </span> {show.totalSeats}
                     <span> &nbsp;|&nbsp; Available Seats: </span>{" "}
-                    {show.totalSeats - show.bookedSeats.length}
+                    {show.totalSeats - (show.bookedSeats?.length || 0)}
                   </h3>
                 </div>
               }
