@@ -57,7 +57,7 @@ const Home = () => {
       <Col xs={{ span: 24 }} lg={{ span: 12 }}>
         <Input
           className="search-input"
-          placeholder="Search movies"
+          placeholder="Search movies..."
           onChange={handleSearch}
           prefix={<SearchOutlined />}
         />
