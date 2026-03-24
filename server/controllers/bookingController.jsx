@@ -94,7 +94,7 @@ function generatePaymentData(payload){
 async function paymentSuccess(req, res) {
   console.log("PAYMENT SUCCESS: ", req.body);
   try {
-    const { txnid, status, amount } = req.params;
+    const { txnid, status, amount } = req.body;
 
     const transaction = await Transaction.findOneAndUpdate(
       { txnid },
@@ -129,7 +129,7 @@ async function paymentSuccess(req, res) {
 async function paymentFailure(req, res) {
   console.log("PAYMENT FAILURE: ", req.body);
   try {
-    const { txnid, status } = req.params;
+    const { txnid, status } = req.body;
 
     const transaction = await Transaction.findOneAndUpdate(
       { txnid },
