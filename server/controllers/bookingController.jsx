@@ -81,8 +81,8 @@ function generatePaymentData(payload){
       firstname,
       email,
       phone: "1234567890", // Example
-      surl: `${ngrock_url}/payment-success`, // Success callback
-      furl: `${ngrock_url}/payment-failure`, // Failure callback
+      surl: `${ngrock_url}/payment-success`,
+      furl: `${ngrock_url}/payment-failure`,
       hash,
     };
   }
