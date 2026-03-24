@@ -5,9 +5,9 @@
 
   bookingRouter.post("/book-show", bookShow);
 
-  bookingRouter.post("/payment-success", paymentSuccess);
+  bookingRouter.get("/payment-success", paymentSuccess);
 
-  bookingRouter.post("/payment-failure", paymentFailure);
+  bookingRouter.get("/payment-failure", paymentFailure);
 
 
   module.exports = bookingRouter;
