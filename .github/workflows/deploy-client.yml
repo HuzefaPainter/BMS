@@ -1,0 +1,44 @@
+name: Deploy Client
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'client/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
+      - name: Build and push client image
+        run: |
+          docker build -t asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/bms-repo/bms-client:latest ./client
+          docker push asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/bms-repo/bms-client:latest
+
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            docker pull asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/bms-repo/bms-client:latest
+            docker stop bms-client || true
+            docker rm bms-client || true
+            docker run -d \
+              --name bms-client \
+              -p 3000:80 \
+              --restart unless-stopped \
+              asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/bms-repo/bms-client:latest

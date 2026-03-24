@@ -1,10 +1,10 @@
 import axios from "axios";
+import { api_domain } from "../api_constants";
 
 export const axiosInstance = axios.create({
-    baseURL: "http://localhost:8081",
+    baseURL: api_domain,
     headers: {
-        // withCredentials: true,
-        "Content-Type" : "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`
     }
 });
