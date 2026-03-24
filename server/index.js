@@ -29,6 +29,6 @@ app.use("/", bookingRoute);
 app.use("/", transactionRoute);
 
 app.listen(8081, () => {
-    console.log('server running')
-    startCleanupJob();
+  console.log('server running v2')
+  startCleanupJob();
 });
