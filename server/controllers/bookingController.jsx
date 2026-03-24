@@ -9,6 +9,7 @@ const PAYU_SALT = process.env.payu_salt;
 const ngrock_url = process.env.ngrok_domain;
 const frontend_url = process.env.frontend_domain;
 const {v4: uuidv4} = require('uuid');
+const { sendBookingConfirmation } = require('../utils/mailer');
 
 async function bookShow(request, response) {
   const session = await mongoose.startSession();
@@ -105,7 +106,18 @@ async function paymentSuccess(req, res) {
       return res.redirect(`${frontend_url}/payment-failure`);
     }
 
-    await Booking.findByIdAndUpdate(transaction.booking, { status: "confirmed" });
+    const booking = await Booking.findByIdAndUpdate(
+      transaction.booking,
+      { status: "confirmed" },
+      { new: true }
+    )
+    .populate("user")
+    .populate({ path: "show", populate: { path: "movie", model: "movies" } })
+    .populate({ path: "show", populate: { path: "theatre", model: "theatres" } });
+
+    if (booking) {
+      await sendBookingConfirmation(booking);
+    }
 
     res.redirect(`${frontend_url}/payment-success?txnid=${txnid}&status=${status}&amount=${amount}`);
   } catch (error) {
