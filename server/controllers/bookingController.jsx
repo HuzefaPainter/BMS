@@ -11,6 +11,16 @@ const frontend_url = process.env.frontend_domain;
 const {v4: uuidv4} = require('uuid');
 const { sendBookingConfirmation } = require('../utils/mailer');
 
+function verifyPayUHash(params) {
+  const { hash, status, udf5 = '', udf4 = '', udf3 = '', udf2 = '', udf1 = '',
+    email, firstname, productinfo, amount, txnid, key } = params;
+
+  const hashString = `${PAYU_SALT}|${status}|${udf5}|${udf4}|${udf3}|${udf2}|${udf1}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${key}`;
+  const computedHash = crypto.createHash('sha512').update(hashString).digest('hex');
+
+  return computedHash === hash;
+}
+
 async function bookShow(request, response) {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -96,6 +106,12 @@ async function paymentSuccess(req, res) {
   try {
     const { txnid, status, amount } = req.body;
 
+    const isValid = verifyPayUHash(req.body);
+    if (!isValid) {
+      console.error("PayU hash verification failed — possible tampered callback");
+      return res.redirect(`${frontend_url}/payment-failure`);
+    }
+
     const transaction = await Transaction.findOneAndUpdate(
       { txnid },
       { status: "success" },
@@ -130,6 +146,12 @@ async function paymentFailure(req, res) {
   console.log("PAYMENT FAILURE: ", req.body);
   try {
     const { txnid, status } = req.body;
+
+    const isValid = verifyPayUHash(req.body);
+    if (!isValid) {
+      console.error("PayU hash verification failed on failure callback");
+      return res.redirect(`${frontend_url}/payment-failure`);
+    }
 
     const transaction = await Transaction.findOneAndUpdate(
       { txnid },
