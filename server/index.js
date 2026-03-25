@@ -3,10 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require("./config/dbconfig");
-import { rateLimit } from 'express-rate-limit'
+const rateLimit = require('express-rate-limit');
 const bodyParser = require('body-parser');
 const mongoSanitize = require('express-mongo-sanitize');
-import helmet from "helmet";
+const helmet = require('helmet');
 
 const userRoute = require("./routes/userRoutes");
 const movieRoute = require("./routes/movieRoutes");
