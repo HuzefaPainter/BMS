@@ -15,7 +15,8 @@ function verifyPayUHash(params) {
   const { hash, status, udf5 = '', udf4 = '', udf3 = '', udf2 = '', udf1 = '',
     email, firstname, productinfo, amount, txnid, key } = params;
 
-  const hashString = `${PAYU_SALT}|${status}|${udf5}|${udf4}|${udf3}|${udf2}|${udf1}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${key}`;
+  const hashString = `${PAYU_SALT}|${status}||||||${udf5}|${udf4}|${udf3}|${udf2}|${udf1}|${email}|${firstname}|${productinfo}|${amount}|${txnid}|${key}`;
+  // const hashString = `${PAYU_KEY}|${txnid}|${amount}|${productInfo}|${firstname}|${email}|||||||||||${PAYU_SALT}`;
   const computedHash = crypto.createHash('sha512').update(hashString).digest('hex');
 
   return computedHash === hash;
